@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">WatchersExplorer</string>
     <string name="retry">Retry</string>
+    <string name="search_repository">Search repository</string>
 </resources>

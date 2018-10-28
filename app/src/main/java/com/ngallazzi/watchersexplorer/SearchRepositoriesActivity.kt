@@ -1,15 +1,19 @@
 package com.ngallazzi.watchersexplorer
 
 import android.R.attr.duration
+import android.app.SearchManager
+import android.content.Context
+import android.content.Intent
+import android.content.Intent.*
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.View
+import android.view.Menu
+import android.widget.SearchView
 import com.ngallazzi.watchersexplorer.remote.GithubApi.Companion.disposable
 import com.ngallazzi.watchersexplorer.remote.GithubApi.Companion.gitHubApiServe
 import com.ngallazzi.watchersexplorer.remote.PaginatedResponse
-import com.ngallazzi.watchersexplorer.remote.models.Repository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_search_repositories.*
@@ -20,7 +24,12 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_repositories)
-        searchRepositories(KEY)
+        // Verify the action and get the query
+        if (ACTION_SEARCH == intent.action) {
+            intent.getStringExtra(SearchManager.QUERY)?.also { query ->
+                searchRepositories(query)
+            }
+        }
     }
 
     fun searchRepositories(key: String) {
@@ -43,6 +52,17 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         Snackbar.make(clContainer, error, duration)
                 .setAction(getString(R.string.retry),
                         { searchRepositories(KEY) })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.options_menu, menu)
+        // Associate searchable configuration with the SearchView
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu.findItem(R.id.search).actionView as SearchView).apply {
+            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        }
+
+        return true
     }
 
     companion object {
