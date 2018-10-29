@@ -2,4 +2,7 @@
     <string name="app_name">WatchersExplorer</string>
     <string name="retry">Retry</string>
     <string name="search_repository">Search repository</string>
+    <string name="type_repository_name_hint">Type a repository name please</string>
+    <string name="no_repositories_found">No repositories found with this name</string>
+    <string name="repository_name_placeholder">Repository name</string>
 </resources>
