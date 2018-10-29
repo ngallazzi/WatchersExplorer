@@ -3,6 +3,7 @@ package com.ngallazzi.watchersexplorer
 import android.R.attr.duration
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.content.Intent.ACTION_SEARCH
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -30,10 +31,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search_repositories)
         // Verify the action and get the query
         if (ACTION_SEARCH == intent.action) {
-            intent.getStringExtra(SearchManager.QUERY)?.also { query ->
-                searchRepositories(query)
-                this.query = query
-            }
+            handleIntent(intent)
         }
         rvRepositories.layoutManager = LinearLayoutManager(this)
         rvRepositories.adapter = RepositoryAdapter(repositories, this)
@@ -63,15 +61,30 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     }
 
     private fun showRepos(response: PaginatedResponse) {
-        repositories.clear()
         for (item in response.items) {
             repositories.add(item)
+        }
+        rvRepositories.adapter?.notifyDataSetChanged()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        intent.getStringExtra(SearchManager.QUERY)?.also { query ->
+            this.query = query
+            repositories.clear()
+            searchRepositories(query)
         }
     }
 
     private fun showError(error: String) {
         Snackbar.make(clContainer, error, duration)
-                .setAction(getString(R.string.retry)) { searchRepositories(query) }
+                .setAction(getString(R.string.retry)) {
+                    repositories.clear()
+                    searchRepositories(query)
+                }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -81,13 +94,8 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         (menu.findItem(R.id.search).actionView as SearchView).apply {
             setSearchableInfo(searchManager.getSearchableInfo(componentName))
             setIconifiedByDefault(false)
-            requestFocusFromTouch()
         }
 
         return true
-    }
-
-    companion object {
-        val TAG = SearchRepositoriesActivity::class.simpleName
     }
 }
