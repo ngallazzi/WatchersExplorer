@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.View
+import com.ngallazzi.watchersexplorer.remote.GitHubHelper
 import com.ngallazzi.watchersexplorer.remote.GithubApi.Companion.disposable
 import com.ngallazzi.watchersexplorer.remote.GithubApi.Companion.gitHubApiServe
 import com.ngallazzi.watchersexplorer.remote.PaginatedResponse
@@ -25,6 +26,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
 
     var repositories: ArrayList<Repository> = ArrayList()
     lateinit var query: String
+    var totalPages: Int = Int.MAX_VALUE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,11 +45,12 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         { result ->
+                            totalPages = GitHubHelper.getTotalPages(result.response()?.headers()!!)
                             when {
-                                result.itemsCount > 0 -> {
+                                result.response()!!.isSuccessful -> {
                                     rvRepositories.visibility = View.VISIBLE
                                     tvHint.visibility = View.GONE
-                                    showRepos(result)
+                                    showRepos(result.response()!!.body()!!)
                                 }
                                 else -> {
                                     tvHint.visibility = View.VISIBLE
