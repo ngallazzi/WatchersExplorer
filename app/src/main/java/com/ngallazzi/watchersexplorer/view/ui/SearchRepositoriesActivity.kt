@@ -67,13 +67,15 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                     if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                             && firstVisibleItemPosition >= 0
                             && totalItemCount >= ITEMS_PER_PAGE_COUNT) {
+                        totalPagesCount = getTotalPagesCount(totalItemCount, visibleItemCount)
                         currentPageIndex += 1
                         mRepositoriesViewModelProviders.getRepositories(query, currentPageIndex)
                                 .observe(this@SearchRepositoriesActivity, Observer<RepositoriesResponse> {
                                     if (it.items.count() > 0) {
                                         tvHint.visibility = View.GONE
                                         rvRepositories.visibility = View.VISIBLE
-                                        showRepos(it)
+                                        addReposToAdapter(it)
+                                        rvRepositories.adapter?.notifyDataSetChanged()
                                     } else {
                                         // todo show error
                                     }
@@ -85,11 +87,10 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     }
 
 
-    private fun showRepos(response: RepositoriesResponse) {
+    private fun addReposToAdapter(response: RepositoriesResponse) {
         for (item in response.items) {
             repositories.add(item)
         }
-        rvRepositories.adapter?.notifyDataSetChanged()
         Log.v(TAG, "Repositories array size: " + repositories.size)
     }
 
@@ -113,7 +114,8 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                         if (it.items.count() > 0) {
                             tvHint.visibility = View.GONE
                             rvRepositories.visibility = View.VISIBLE
-                            showRepos(it)
+                            addReposToAdapter(it)
+                            rvRepositories.adapter?.notifyDataSetChanged()
                         } else {
                             // todo show error
                         }
@@ -131,6 +133,14 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    private fun getTotalPagesCount(totalItemsCount: Int, itemsPerPageCount: Int): Int {
+        var pageCount = totalItemsCount / itemsPerPageCount
+        if (totalItemsCount % itemsPerPageCount > 0) {
+            pageCount++
+        }
+        return pageCount
     }
 
     companion object {

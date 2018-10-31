@@ -32,22 +32,11 @@ class RepositoriesViewModel : ViewModel() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    var totalPagesCount = getTotalPagesCount(it.itemsCount, SearchRepositoriesActivity.ITEMS_PER_PAGE_COUNT)
-                    Log.v(SearchRepositoriesActivity.TAG, "Total pages count: " + totalPagesCount)
-                    Log.v(SearchRepositoriesActivity.TAG, "Current page index " + pageIndex)
                     Log.v(SearchRepositoriesActivity.TAG, "Current page items count " + it.items.count())
                     var liveData: MutableLiveData<RepositoriesResponse> = MutableLiveData()
                     liveData.value = it
                     repositoriesResponse = liveData
                 }
-    }
-
-    private fun getTotalPagesCount(totalItemsCount: Int, itemsPerPageCount: Int): Int {
-        var pageCount = totalItemsCount / itemsPerPageCount
-        if (totalItemsCount % itemsPerPageCount > 0) {
-            pageCount++
-        }
-        return pageCount
     }
 }
 
