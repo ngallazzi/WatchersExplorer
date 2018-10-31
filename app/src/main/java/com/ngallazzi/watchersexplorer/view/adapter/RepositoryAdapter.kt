@@ -1,11 +1,11 @@
-package com.ngallazzi.watchersexplorer
+package com.ngallazzi.watchersexplorer.view.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.ngallazzi.watchersexplorer.R.id.ivOwnerImage
+import com.ngallazzi.watchersexplorer.R
 import com.ngallazzi.watchersexplorer.remote.models.Repository
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_repository.view.*
@@ -22,7 +22,7 @@ class RepositoryAdapter(private val repositories: ArrayList<Repository>, val con
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.tvRepositoryName.text = repositories[position].name
+        holder.tvRepositoryName.text = repositories[position].name + " - " + position
         Picasso.get().load(repositories[position].owner.avatarUrl).into(holder.ivOwnerImage)
     }
 

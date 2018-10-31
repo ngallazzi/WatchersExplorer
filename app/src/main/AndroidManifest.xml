@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SearchRepositoriesActivity"
+            android:name=".view.ui.SearchRepositoriesActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>

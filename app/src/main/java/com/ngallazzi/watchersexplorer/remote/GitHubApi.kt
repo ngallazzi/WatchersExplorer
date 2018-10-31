@@ -5,6 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -15,13 +16,14 @@ import retrofit2.http.Query
 interface GithubApi {
     @GET("search/repositories")
     fun listRepositories(@Query("q") key: String,
-                         @Query("page") page: Int = 1): Observable<Result<PaginatedResponse>>
+                         @Query("page") page: Int = 1,
+                         @Query("per_page") perPage: Int = 20): Observable<PaginatedResponse>
 
     companion object {
         private fun create(): GithubApi {
 
-            val interceptor = HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            val interceptor = HttpLoggingInterceptor()
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
             var client = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
             val retrofit = Retrofit.Builder()
@@ -39,6 +41,8 @@ interface GithubApi {
         val gitHubApiServe by lazy {
             GithubApi.create()
         }
+
+        var disposable: Disposable? = null
     }
 
 
