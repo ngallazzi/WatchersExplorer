@@ -1,32 +1,30 @@
 package com.ngallazzi.watchersexplorer.view.ui
 
-import android.R.attr.duration
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_SEARCH
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.Menu
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.ngallazzi.watchersexplorer.R
-import com.ngallazzi.watchersexplorer.remote.GithubApi.Companion.disposable
-import com.ngallazzi.watchersexplorer.remote.GithubApi.Companion.gitHubApiServe
-import com.ngallazzi.watchersexplorer.remote.PaginatedResponse
+import com.ngallazzi.watchersexplorer.remote.models.RepositoriesResponse
 import com.ngallazzi.watchersexplorer.remote.models.Repository
+import com.ngallazzi.watchersexplorer.remote.viewmodels.RepositoriesViewModel
 import com.ngallazzi.watchersexplorer.view.adapter.RepositoryAdapter
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_search_repositories.*
 
 
 class SearchRepositoriesActivity : AppCompatActivity() {
-
+    private lateinit var mRepositoriesViewModelProviders: RepositoriesViewModel
+    private lateinit var rvAdapter: RecyclerView.Adapter<*>
     private var repositories: ArrayList<Repository> = ArrayList()
     private lateinit var rvLayoutManager: LinearLayoutManager
     private lateinit var query: String
@@ -38,14 +36,22 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_repositories)
+        mRepositoriesViewModelProviders = ViewModelProviders.of(this).get(RepositoriesViewModel::class.java)
+
         // Verify the action and get the query
         if (ACTION_SEARCH == intent.action) {
             resetSearchIndexes()
             startFirstSearch(intent)
         }
+
         rvLayoutManager = LinearLayoutManager(this)
-        rvRepositories.layoutManager = rvLayoutManager
-        rvRepositories.adapter = RepositoryAdapter(repositories, this)
+        rvAdapter = RepositoryAdapter(repositories, this)
+
+        rvRepositories.apply {
+            layoutManager = rvLayoutManager
+            adapter = rvAdapter
+        }
+
         rvRepositories.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -62,46 +68,24 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                             && firstVisibleItemPosition >= 0
                             && totalItemCount >= ITEMS_PER_PAGE_COUNT) {
                         currentPageIndex += 1
-                        searchRepositories(currentPageIndex)
+                        mRepositoriesViewModelProviders.getRepositories(query, currentPageIndex)
+                                .observe(this@SearchRepositoriesActivity, Observer<RepositoriesResponse> {
+                                    if (it.items.count() > 0) {
+                                        tvHint.visibility = View.GONE
+                                        rvRepositories.visibility = View.VISIBLE
+                                        showRepos(it)
+                                    } else {
+                                        // todo show error
+                                    }
+                                })
                     }
                 }
             }
         })
     }
 
-    private fun searchRepositories(pageIndex: Int) {
-        isLoading = true
-        disposable = gitHubApiServe.listRepositories(query, pageIndex, ITEMS_PER_PAGE_COUNT)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        {
-                            isLoading = false
-                            totalPagesCount = getTotalPagesCount(it.itemsCount, ITEMS_PER_PAGE_COUNT)
-                            Log.v(TAG, "Total pages count: " + totalPagesCount)
-                            Log.v(TAG, "Current page index " + pageIndex)
-                            Log.v(TAG, "Current page items count " + it.items.count())
-                            when {
-                                it.items.count() > 0 -> {
-                                    rvRepositories.visibility = View.VISIBLE
-                                    tvHint.visibility = View.GONE
-                                    showRepos(it)
-                                }
-                                else -> {
-                                    tvHint.visibility = View.VISIBLE
-                                    rvRepositories.visibility = View.GONE
-                                    showError(error = getString(R.string.no_repositories_found))
-                                }
-                            }
-                        },
-                        { error ->
-                            isLoading = false
-                            showError(error = error.message!!)
-                        }
-                )
-    }
 
-    private fun showRepos(response: PaginatedResponse) {
+    private fun showRepos(response: RepositoriesResponse) {
         for (item in response.items) {
             repositories.add(item)
         }
@@ -118,23 +102,23 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         isLoading = false
         isLastPage = false
         totalPagesCount = 0
-        totalPagesCount = 1
     }
 
     private fun startFirstSearch(intent: Intent) {
         intent.getStringExtra(SearchManager.QUERY)?.also { query ->
             this.query = query
             repositories.clear()
-            searchRepositories(1)
+            mRepositoriesViewModelProviders.getRepositories(query, currentPageIndex)
+                    .observe(this, Observer<RepositoriesResponse> {
+                        if (it.items.count() > 0) {
+                            tvHint.visibility = View.GONE
+                            rvRepositories.visibility = View.VISIBLE
+                            showRepos(it)
+                        } else {
+                            // todo show error
+                        }
+                    })
         }
-    }
-
-    private fun showError(error: String) {
-        Snackbar.make(clContainer, error, duration)
-                .setAction(getString(R.string.retry)) {
-                    repositories.clear()
-                    searchRepositories(currentPageIndex)
-                }.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -147,14 +131,6 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         }
 
         return true
-    }
-
-    private fun getTotalPagesCount(totalItemsCount: Int, itemsPerPageCount: Int): Int {
-        var pageCount = totalItemsCount / itemsPerPageCount
-        if (totalItemsCount % itemsPerPageCount > 0) {
-            pageCount++
-        }
-        return pageCount
     }
 
     companion object {
