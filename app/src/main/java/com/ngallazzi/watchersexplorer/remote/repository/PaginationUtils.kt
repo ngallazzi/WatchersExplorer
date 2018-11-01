@@ -1,4 +1,4 @@
-package com.ngallazzi.watchersexplorer.service.pagination
+package com.ngallazzi.watchersexplorer.remote
 
 /**
  * WatchersExplorer

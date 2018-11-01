@@ -5,25 +5,24 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_SEARCH
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.ngallazzi.watchersexplorer.R
-import com.ngallazzi.watchersexplorer.remote.models.RepositoriesResponse
 import com.ngallazzi.watchersexplorer.remote.models.Repository
-import com.ngallazzi.watchersexplorer.remote.viewmodels.RepositoriesViewModel
 import com.ngallazzi.watchersexplorer.view.adapter.RepositoryAdapter
 import kotlinx.android.synthetic.main.activity_search_repositories.*
 
 
 class SearchRepositoriesActivity : AppCompatActivity() {
-    private lateinit var mRepositoriesViewModelProviders: RepositoriesViewModel
+    private lateinit var mActivityViewModel: SearchRepositoriesActivityViewModel
     private lateinit var rvAdapter: RecyclerView.Adapter<*>
     private var repositories: ArrayList<Repository> = ArrayList()
     private lateinit var rvLayoutManager: LinearLayoutManager
@@ -36,8 +35,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_repositories)
-        mRepositoriesViewModelProviders = ViewModelProviders.of(this).get(RepositoriesViewModel::class.java)
-
+        mActivityViewModel = ViewModelProviders.of(this).get(SearchRepositoriesActivityViewModel::class.java)
         // Verify the action and get the query
         if (ACTION_SEARCH == intent.action) {
             resetSearchIndexes()
@@ -51,6 +49,15 @@ class SearchRepositoriesActivity : AppCompatActivity() {
             layoutManager = rvLayoutManager
             adapter = rvAdapter
         }
+
+        // Create the observer which updates the UI.
+        mActivityViewModel.repositoriesResponse.observe(this, Observer { response ->
+            updateUi(response.items)
+        })
+
+        mActivityViewModel.showError.observe(this, Observer {
+            Toast.makeText(this@SearchRepositoriesActivity, it, Toast.LENGTH_SHORT).show()
+        })
 
         rvRepositories.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -69,30 +76,14 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                             && totalItemCount >= ITEMS_PER_PAGE_COUNT) {
                         totalPagesCount = getTotalPagesCount(totalItemCount, visibleItemCount)
                         currentPageIndex += 1
-                        mRepositoriesViewModelProviders.getRepositories(query, currentPageIndex)
-                                .observe(this@SearchRepositoriesActivity, Observer<RepositoriesResponse> {
-                                    if (it.items.count() > 0) {
-                                        tvHint.visibility = View.GONE
-                                        rvRepositories.visibility = View.VISIBLE
-                                        addReposToAdapter(it)
-                                        rvRepositories.adapter?.notifyDataSetChanged()
-                                    } else {
-                                        // todo show error
-                                    }
-                                })
+                        mActivityViewModel.getRepositories(query, currentPageIndex)
                     }
                 }
             }
         })
+
     }
 
-
-    private fun addReposToAdapter(response: RepositoriesResponse) {
-        for (item in response.items) {
-            repositories.add(item)
-        }
-        Log.v(TAG, "Repositories array size: " + repositories.size)
-    }
 
     override fun onNewIntent(intent: Intent) {
         resetSearchIndexes()
@@ -109,18 +100,17 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         intent.getStringExtra(SearchManager.QUERY)?.also { query ->
             this.query = query
             repositories.clear()
-            mRepositoriesViewModelProviders.getRepositories(query, currentPageIndex)
-                    .observe(this, Observer<RepositoriesResponse> {
-                        if (it.items.count() > 0) {
-                            tvHint.visibility = View.GONE
-                            rvRepositories.visibility = View.VISIBLE
-                            addReposToAdapter(it)
-                            rvRepositories.adapter?.notifyDataSetChanged()
-                        } else {
-                            // todo show error
-                        }
-                    })
+            mActivityViewModel.getRepositories(query, currentPageIndex)
         }
+    }
+
+    private fun updateUi(repositoriesList: List<Repository>) {
+        tvHint.visibility = View.GONE
+        rvRepositories.visibility = View.VISIBLE
+        for (item in repositoriesList) {
+            repositories.add(item)
+        }
+        rvRepositories.adapter?.notifyDataSetChanged()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -141,6 +131,10 @@ class SearchRepositoriesActivity : AppCompatActivity() {
             pageCount++
         }
         return pageCount
+    }
+
+    private fun showError(error: String) {
+        Snackbar.make(clContainer, error, Snackbar.LENGTH_SHORT).show()
     }
 
     companion object {
