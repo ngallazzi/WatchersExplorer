@@ -5,7 +5,7 @@
     android:id="@+id/clContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.ui.SearchRepositoriesActivity">
+    tools:context=".activities.SearchRepositoriesActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRepositories"

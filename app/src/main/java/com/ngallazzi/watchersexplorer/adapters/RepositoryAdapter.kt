@@ -1,11 +1,13 @@
-package com.ngallazzi.watchersexplorer.view.adapter
+package com.ngallazzi.watchersexplorer.adapters
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.ngallazzi.watchersexplorer.R
+import com.ngallazzi.watchersexplorer.activities.RepositoryDetailsActivity
 import com.ngallazzi.watchersexplorer.remote.models.Repository
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_repository.view.*
@@ -17,23 +19,33 @@ import kotlinx.android.synthetic.main.item_repository.view.*
  */
 class RepositoryAdapter(private val repositories: ArrayList<Repository>, val context: Context) :
         RecyclerView.Adapter<ViewHolder>() {
+
+    override fun getItemCount(): Int {
+        return repositories.size
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_repository, parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.tvRepositoryName.text = repositories[position].name + " - " + position
+        holder.tvRepositoryName.text = repositories[position].name
         Picasso.get().load(repositories[position].owner.avatarUrl).into(holder.ivOwnerImage)
+        holder.clContainer.setOnClickListener({
+            goToRepositoryDetailsActivity(repositories[position])
+        })
     }
 
-    // Gets the number of repositories in the list
-    override fun getItemCount(): Int {
-        return repositories.size
+    fun goToRepositoryDetailsActivity(repository: Repository) {
+        val intent = Intent(context, RepositoryDetailsActivity::class.java)
+        intent.putExtra(context.getString(R.string.repository_id), repository)
+        context.startActivity(intent)
     }
 }
 
 class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the TextView that will add each animal to
+    val clContainer = view.clContainer
     val tvRepositoryName = view.tvRepositoryName!!
     val ivOwnerImage = view.ivOwnerImage
 }

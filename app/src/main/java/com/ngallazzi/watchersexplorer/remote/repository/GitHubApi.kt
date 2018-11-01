@@ -1,7 +1,8 @@
-package com.ngallazzi.watchersexplorer.remote
+package com.ngallazzi.watchersexplorer.remote.repository
 
 import com.ngallazzi.watchersexplorer.BuildConfig
 import com.ngallazzi.watchersexplorer.remote.models.RepositoriesResponse
+import com.squareup.moshi.Moshi
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import okhttp3.OkHttpClient
@@ -11,6 +12,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.util.*
 
 interface GithubApi {
     @GET("search/repositories")
@@ -37,8 +39,9 @@ interface GithubApi {
             return retrofit.create(GithubApi::class.java)
         }
 
+
         val gitHubApiServe by lazy {
-            GithubApi.create()
+            create()
         }
 
         var disposable: Disposable? = null

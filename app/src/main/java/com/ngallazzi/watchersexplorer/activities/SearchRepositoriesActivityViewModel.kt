@@ -1,12 +1,11 @@
-package com.ngallazzi.watchersexplorer.view.ui
+package com.ngallazzi.watchersexplorer.activities
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.ngallazzi.watchersexplorer.remote.GithubApi.Companion.disposable
-import com.ngallazzi.watchersexplorer.remote.GithubApi.Companion.gitHubApiServe
+import com.ngallazzi.watchersexplorer.remote.repository.GithubApi.Companion.disposable
+import com.ngallazzi.watchersexplorer.remote.repository.GithubApi.Companion.gitHubApiServe
 import com.ngallazzi.watchersexplorer.remote.models.RepositoriesResponse
-import com.ngallazzi.watchersexplorer.view.ui.SearchRepositoriesActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 

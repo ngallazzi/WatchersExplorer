@@ -1,4 +1,4 @@
-package com.ngallazzi.watchersexplorer.remote
+package com.ngallazzi.watchersexplorer.remote.repository
 
 /**
  * WatchersExplorer

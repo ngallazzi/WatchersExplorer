@@ -1,4 +1,4 @@
-package com.ngallazzi.watchersexplorer.view.ui
+package com.ngallazzi.watchersexplorer.activities
 
 import android.app.SearchManager
 import android.content.Context
@@ -14,10 +14,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.ngallazzi.watchersexplorer.R
+import com.ngallazzi.watchersexplorer.adapters.RepositoryAdapter
 import com.ngallazzi.watchersexplorer.remote.models.Repository
-import com.ngallazzi.watchersexplorer.view.adapter.RepositoryAdapter
 import kotlinx.android.synthetic.main.activity_search_repositories.*
 
 
@@ -131,10 +130,6 @@ class SearchRepositoriesActivity : AppCompatActivity() {
             pageCount++
         }
         return pageCount
-    }
-
-    private fun showError(error: String) {
-        Snackbar.make(clContainer, error, Snackbar.LENGTH_SHORT).show()
     }
 
     companion object {
