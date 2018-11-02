@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ngallazzi.watchersexplorer.R
-import com.ngallazzi.watchersexplorer.activities.RepositoryDetailsActivity
-import com.ngallazzi.watchersexplorer.remote.models.Repository
+import com.ngallazzi.watchersexplorer.activities.RepositoryWatchersActivity
+import com.ngallazzi.watchersexplorer.models.Repository
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_repository.view.*
 
@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.item_repository.view.*
  * Copyright © 2018 Zehus. All rights reserved.
  */
 class RepositoryAdapter(private val repositories: ArrayList<Repository>, val context: Context) :
-        RecyclerView.Adapter<ViewHolder>() {
+        RecyclerView.Adapter<RepositoryAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
         return repositories.size
@@ -37,15 +37,15 @@ class RepositoryAdapter(private val repositories: ArrayList<Repository>, val con
     }
 
     fun goToRepositoryDetailsActivity(repository: Repository) {
-        val intent = Intent(context, RepositoryDetailsActivity::class.java)
+        val intent = Intent(context, RepositoryWatchersActivity::class.java)
         intent.putExtra(context.getString(R.string.repository_id), repository)
         context.startActivity(intent)
     }
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val clContainer = view.clContainer
+        val tvRepositoryName = view.tvRepositoryName!!
+        val ivOwnerImage = view.ivOwnerImage
+    }
 }
 
-class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    // Holds the TextView that will add each animal to
-    val clContainer = view.clContainer
-    val tvRepositoryName = view.tvRepositoryName!!
-    val ivOwnerImage = view.ivOwnerImage
-}

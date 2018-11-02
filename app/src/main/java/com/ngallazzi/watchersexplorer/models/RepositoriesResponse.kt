@@ -1,4 +1,4 @@
-package com.ngallazzi.watchersexplorer.remote.models
+package com.ngallazzi.watchersexplorer.models
 
 import com.squareup.moshi.Json
 

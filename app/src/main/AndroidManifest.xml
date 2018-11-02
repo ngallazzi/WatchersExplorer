@@ -27,7 +27,7 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".activities.RepositoryDetailsActivity"
+            android:name=".activities.RepositoryWatchersActivity"
             android:parentActivityName=".activities.SearchRepositoriesActivity" />
     </application>
 

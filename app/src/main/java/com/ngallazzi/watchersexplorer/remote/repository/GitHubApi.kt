@@ -1,24 +1,34 @@
 package com.ngallazzi.watchersexplorer.remote.repository
 
 import com.ngallazzi.watchersexplorer.BuildConfig
-import com.ngallazzi.watchersexplorer.remote.models.RepositoriesResponse
-import com.squareup.moshi.Moshi
+import com.ngallazzi.watchersexplorer.models.Owner
+import com.ngallazzi.watchersexplorer.models.RepositoriesResponse
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
-import java.util.*
 
 interface GithubApi {
+
     @GET("search/repositories")
     fun listRepositories(@Query("q") key: String,
                          @Query("page") page: Int = 1,
                          @Query("per_page") perPage: Int = 20): Observable<RepositoriesResponse>
+
+    //https://api.github.com/repos/ngallazzi/tripbook/subscribers
+
+    @GET("repos/{owner}/{repo}/subscribers")
+    fun listWatchers(@Path("owner") ownerName: String,
+                     @Path("repo") repoName: String,
+                     @Query("page") page: Int = 1,
+                     @Query("per_page") per_page: Int = 10): Call<List<Owner>>
 
     companion object {
         private fun create(): GithubApi {

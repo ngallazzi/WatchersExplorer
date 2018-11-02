@@ -16,7 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ngallazzi.watchersexplorer.R
 import com.ngallazzi.watchersexplorer.adapters.RepositoryAdapter
-import com.ngallazzi.watchersexplorer.remote.models.Repository
+import com.ngallazzi.watchersexplorer.models.Repository
+import com.ngallazzi.watchersexplorer.remote.repository.PaginationUtils
 import kotlinx.android.synthetic.main.activity_search_repositories.*
 
 
@@ -72,10 +73,10 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                 if (!isLoading && !isLastPage) {
                     if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                             && firstVisibleItemPosition >= 0
-                            && totalItemCount >= ITEMS_PER_PAGE_COUNT) {
-                        totalPagesCount = getTotalPagesCount(totalItemCount, visibleItemCount)
+                            && totalItemCount >= ITEMS_PER_PAGE) {
+                        totalPagesCount = PaginationUtils.getTotalPagesCount(totalItemCount, visibleItemCount)
                         currentPageIndex += 1
-                        mActivityViewModel.getRepositories(query, currentPageIndex)
+                        mActivityViewModel.getRepositories(query, currentPageIndex, ITEMS_PER_PAGE)
                     }
                 }
             }
@@ -99,7 +100,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         intent.getStringExtra(SearchManager.QUERY)?.also { query ->
             this.query = query
             repositories.clear()
-            mActivityViewModel.getRepositories(query, currentPageIndex)
+            mActivityViewModel.getRepositories(query, currentPageIndex, ITEMS_PER_PAGE)
         }
     }
 
@@ -124,16 +125,8 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         return true
     }
 
-    private fun getTotalPagesCount(totalItemsCount: Int, itemsPerPageCount: Int): Int {
-        var pageCount = totalItemsCount / itemsPerPageCount
-        if (totalItemsCount % itemsPerPageCount > 0) {
-            pageCount++
-        }
-        return pageCount
-    }
 
     companion object {
-        val TAG = SearchRepositoriesActivity::class.simpleName
-        const val ITEMS_PER_PAGE_COUNT = 20
+        const val ITEMS_PER_PAGE = 20
     }
 }

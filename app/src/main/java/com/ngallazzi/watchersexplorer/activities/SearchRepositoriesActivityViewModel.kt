@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ngallazzi.watchersexplorer.remote.repository.GithubApi.Companion.disposable
 import com.ngallazzi.watchersexplorer.remote.repository.GithubApi.Companion.gitHubApiServe
-import com.ngallazzi.watchersexplorer.remote.models.RepositoriesResponse
+import com.ngallazzi.watchersexplorer.models.RepositoriesResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -19,8 +19,8 @@ class SearchRepositoriesActivityViewModel : ViewModel() {
     var repositoriesResponse: MutableLiveData<RepositoriesResponse> = MutableLiveData()
     var showError: MutableLiveData<String> = MutableLiveData()
 
-    fun getRepositories(query: String, pageIndex: Int): LiveData<RepositoriesResponse> {
-        disposable = gitHubApiServe.listRepositories(query, pageIndex, SearchRepositoriesActivity.ITEMS_PER_PAGE_COUNT)
+    fun getRepositories(query: String, pageIndex: Int, itemsPerPage: Int) {
+        disposable = gitHubApiServe.listRepositories(query, pageIndex, itemsPerPage)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -28,7 +28,6 @@ class SearchRepositoriesActivityViewModel : ViewModel() {
                         { error -> showError.postValue(error.message) }
                 )
 
-        return repositoriesResponse
     }
 }
 
