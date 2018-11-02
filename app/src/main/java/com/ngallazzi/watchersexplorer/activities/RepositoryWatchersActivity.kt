@@ -62,6 +62,7 @@ class RepositoryWatchersActivity : AppCompatActivity() {
         for (item in watchersResponse.watchers) {
             watchers.add(item)
         }
+        rvAdapter.notifyDataSetChanged()
         tvWatchers.text = getString(R.string.watchers, watchersResponse.totalPagesCount, ITEMS_PER_PAGE)
     }
 
