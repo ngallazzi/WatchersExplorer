@@ -55,6 +55,8 @@ dependencies {
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
+    androidTestImplementation "androidx.arch.core:core-testing:2.0.0"
+
 }
 repositories {
     mavenCentral()

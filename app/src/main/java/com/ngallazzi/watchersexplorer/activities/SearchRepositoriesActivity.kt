@@ -21,7 +21,7 @@ import com.ngallazzi.watchersexplorer.remote.repository.PaginationUtils
 import kotlinx.android.synthetic.main.activity_search_repositories.*
 
 
-class SearchRepositoriesActivity : AppCompatActivity() {
+open class SearchRepositoriesActivity : AppCompatActivity() {
     private lateinit var mActivityViewModel: SearchRepositoriesActivityViewModel
     private lateinit var rvAdapter: RecyclerView.Adapter<*>
     private var repositories: ArrayList<Repository> = ArrayList()
