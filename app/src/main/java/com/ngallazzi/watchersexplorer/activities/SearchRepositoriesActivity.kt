@@ -52,6 +52,7 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
 
         // Create the observer which updates the UI.
         mActivityViewModel.repositoriesResponse.observe(this, Observer { response ->
+            isLoading = false;
             updateUi(response.items)
         })
 
@@ -67,16 +68,17 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                val visibleItemCount = rvLayoutManager.childCount
-                val totalItemCount = rvLayoutManager.itemCount
-                val firstVisibleItemPosition = rvLayoutManager.findFirstVisibleItemPosition()
+                val rvVisibleItemsCount = rvLayoutManager.childCount
+                val rvTotalItemsCount = rvLayoutManager.itemCount
+                val rvFirstVisibleItemPosition = rvLayoutManager.findFirstVisibleItemPosition()
                 if (!isLoading && !isLastPage) {
-                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                            && firstVisibleItemPosition >= 0
-                            && totalItemCount >= ITEMS_PER_PAGE) {
-                        totalPagesCount = PaginationUtils.getTotalPagesCount(totalItemCount, visibleItemCount)
+                    if ((rvVisibleItemsCount + rvFirstVisibleItemPosition) >= rvTotalItemsCount
+                            && rvFirstVisibleItemPosition >= 0
+                            && rvTotalItemsCount >= ITEMS_PER_PAGE) {
+                        totalPagesCount = PaginationUtils.getTotalPagesCount(rvTotalItemsCount, rvVisibleItemsCount)
                         currentPageIndex += 1
                         mActivityViewModel.getRepositories(query, currentPageIndex, ITEMS_PER_PAGE)
+                        isLoading = true
                     }
                 }
             }
@@ -94,6 +96,7 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
         isLoading = false
         isLastPage = false
         totalPagesCount = 0
+        currentPageIndex = 1
     }
 
     private fun startFirstSearch(intent: Intent) {

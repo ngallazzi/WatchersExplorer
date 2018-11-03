@@ -30,6 +30,7 @@ class RepositoryAdapter(private val repositories: ArrayList<Repository>, val con
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.tvRepositoryName.text = repositories[position].name
+        holder.tvRepositoryOwner.text = repositories[position].owner.login
         Picasso.get().load(repositories[position].owner.avatarUrl).into(holder.ivOwnerImage)
         holder.clContainer.setOnClickListener({
             goToRepositoryDetailsActivity(repositories[position])
@@ -45,6 +46,7 @@ class RepositoryAdapter(private val repositories: ArrayList<Repository>, val con
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val clContainer = view.clContainer
         val tvRepositoryName = view.tvRepositoryName!!
+        val tvRepositoryOwner = view.tvRepositoryOwner
         val ivOwnerImage = view.ivOwnerImage
     }
 }

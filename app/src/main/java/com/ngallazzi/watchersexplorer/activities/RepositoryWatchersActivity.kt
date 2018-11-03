@@ -2,6 +2,7 @@ package com.ngallazzi.watchersexplorer.activities
 
 import android.os.Bundle
 import android.text.Html
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,8 @@ class RepositoryWatchersActivity : AppCompatActivity() {
     private lateinit var rvAdapter: RecyclerView.Adapter<*>
     private var watchers: ArrayList<Owner> = ArrayList()
     private lateinit var rvLayoutManager: GridLayoutManager
+    private var totalPages = 1
+    private var currentPageIndex = 1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,9 +47,25 @@ class RepositoryWatchersActivity : AppCompatActivity() {
             layoutManager = rvLayoutManager
         }
 
+        rvWatchers.addOnScrollListener(object : EndlessRecyclerViewScrollListener(rvLayoutManager) {
+            override fun onLoadMore(page: Int, view: RecyclerView) {
+                if (currentPageIndex < totalPages) {
+                    currentPageIndex += 1
+                    mActivityViewModel.getWatchers(mRepository.owner.login, mRepository.name,
+                            currentPageIndex, ITEMS_PER_PAGE)
+                }
+            }
+
+        })
+
         // Create the observer which updates the UI.
         mActivityViewModel.watchersResponse.observe(this, Observer { response ->
+            totalPages = response.totalPagesCount
+            currentPageIndex = response.currentPageIndex
             updateUi(response)
+            Log.v(TAG, "Current page index: " + currentPageIndex)
+            Log.v(TAG, "Total pages: " + totalPages)
+            Log.v(TAG, "Items count: " + response.watchers.size)
         })
 
         mActivityViewModel.showError.observe(this, Observer {
@@ -54,7 +73,7 @@ class RepositoryWatchersActivity : AppCompatActivity() {
         })
 
         mActivityViewModel.getWatchers(mRepository.owner.login, mRepository.name,
-                1, ITEMS_PER_PAGE)
+                currentPageIndex, ITEMS_PER_PAGE)
     }
 
     private fun updateUi(watchersResponse: WatchersResponse) {
@@ -63,7 +82,6 @@ class RepositoryWatchersActivity : AppCompatActivity() {
             watchers.add(item)
         }
         rvAdapter.notifyDataSetChanged()
-        tvWatchers.text = getString(R.string.watchers, watchersResponse.totalPagesCount, ITEMS_PER_PAGE)
     }
 
     private fun setLayoutHeader(repository: Repository) {
@@ -75,5 +93,6 @@ class RepositoryWatchersActivity : AppCompatActivity() {
 
     companion object {
         const val ITEMS_PER_PAGE = 20
+        val TAG = RepositoryWatchersActivity::class.java.simpleName
     }
 }

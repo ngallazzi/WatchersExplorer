@@ -10,9 +10,9 @@
         android:id="@+id/ivOwnerImage"
         android:layout_width="@dimen/image_base_size"
         android:layout_height="@dimen/image_base_size"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:src="@drawable/ic_search_white_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,8 +23,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/ivOwnerImage"
+        app:layout_constraintBottom_toTopOf="@+id/tvRepositoryOwner"
         app:layout_constraintStart_toEndOf="@+id/ivOwnerImage"
-        app:layout_constraintTop_toTopOf="@+id/ivOwnerImage"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="@string/repository_name_placeholder" />
+
+    <TextView
+        android:id="@+id/tvRepositoryOwner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivOwnerImage"
+        app:layout_constraintTop_toBottomOf="@+id/tvRepositoryName"
+        tools:text="Owner" />
 </androidx.constraintlayout.widget.ConstraintLayout>
