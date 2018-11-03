@@ -59,7 +59,8 @@ class RepositoryWatchersActivity : AppCompatActivity() {
         })
 
         // Create the observer which updates the UI.
-        mActivityViewModel.watchersResponse.observe(this, Observer { response ->
+        mActivityViewModel.getWatchers(mRepository.owner.login, mRepository.name,
+                currentPageIndex, ITEMS_PER_PAGE).observe(this, Observer<WatchersResponse> { response ->
             totalPages = response.totalPagesCount
             currentPageIndex = response.currentPageIndex
             updateUi(response)
@@ -68,8 +69,8 @@ class RepositoryWatchersActivity : AppCompatActivity() {
             Log.v(TAG, "Items count: " + response.watchers.size)
         })
 
-        mActivityViewModel.showError.observe(this, Observer {
-            Toast.makeText(this@RepositoryWatchersActivity, it, Toast.LENGTH_SHORT).show()
+        mActivityViewModel.getError().observe(this, Observer {
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
 
         mActivityViewModel.getWatchers(mRepository.owner.login, mRepository.name,

@@ -26,7 +26,7 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
     private lateinit var rvAdapter: RecyclerView.Adapter<*>
     private var repositories: ArrayList<Repository> = ArrayList()
     private lateinit var rvLayoutManager: LinearLayoutManager
-    private lateinit var query: String
+    private var query: String = ""
     private var isLoading: Boolean = false
     private var isLastPage: Boolean = false
     private var totalPagesCount: Int = 0
