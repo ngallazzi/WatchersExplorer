@@ -24,10 +24,9 @@ class RepositoryWatchersActivityViewModel() : ViewModel() {
     private lateinit var watchersResponse: MutableLiveData<WatchersResponse>
     private lateinit var showError: MutableLiveData<String>
 
-    fun getWatchers(ownerName: String, repoName: String, pageIndex: Int, perPage: Int): LiveData<WatchersResponse> {
+    fun getWatchers(): LiveData<WatchersResponse> {
         if (!::watchersResponse.isInitialized) {
             watchersResponse = MutableLiveData()
-            loadWatchers(ownerName, repoName, pageIndex, perPage)
         }
         return watchersResponse
     }
@@ -39,7 +38,7 @@ class RepositoryWatchersActivityViewModel() : ViewModel() {
         return showError
     }
 
-    private fun loadWatchers(ownerName: String, repoName: String, pageIndex: Int, perPage: Int) {
+    public fun loadWatchers(ownerName: String, repoName: String, pageIndex: Int, perPage: Int) {
         val service = GithubApi.gitHubApiServe
         val call = service.listWatchers(ownerName, repoName, pageIndex, perPage)
         call.enqueue(object : Callback<List<Owner>> {

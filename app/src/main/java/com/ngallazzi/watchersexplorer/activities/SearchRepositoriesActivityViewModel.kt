@@ -16,8 +16,8 @@ import io.reactivex.schedulers.Schedulers
  */
 
 class SearchRepositoriesActivityViewModel : ViewModel() {
-    var repositoriesResponse: MutableLiveData<RepositoriesResponse> = MutableLiveData()
-    var showError: MutableLiveData<String> = MutableLiveData()
+    var repositoriesResponse: MutableLiveData<RepositoriesResponse> = MutableLiveData() // todo make this private
+    var showError: MutableLiveData<String> = MutableLiveData() // todo make this private
 
     fun getRepositories(query: String, pageIndex: Int, itemsPerPage: Int) {
         disposable = gitHubApiServe.listRepositories(query, pageIndex, itemsPerPage)

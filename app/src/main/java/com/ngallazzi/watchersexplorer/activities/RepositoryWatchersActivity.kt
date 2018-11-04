@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -30,6 +31,7 @@ class RepositoryWatchersActivity : AppCompatActivity() {
     private lateinit var rvLayoutManager: GridLayoutManager
     private var totalPages = 1
     private var currentPageIndex = 1
+    private lateinit var watchersLiveData: LiveData<WatchersResponse>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,34 +49,34 @@ class RepositoryWatchersActivity : AppCompatActivity() {
             layoutManager = rvLayoutManager
         }
 
+        watchersLiveData = mActivityViewModel.getWatchers()
+
+        watchersLiveData.observe(this@RepositoryWatchersActivity, Observer {
+            totalPages = it.totalPagesCount
+            currentPageIndex = it.currentPageIndex
+            updateUi(it)
+            Log.v(TAG, "Current page index: " + currentPageIndex)
+            Log.v(TAG, "Total pages: " + totalPages)
+            Log.v(TAG, "Items count: " + it.watchers.size)
+        })
+
         rvWatchers.addOnScrollListener(object : EndlessRecyclerViewScrollListener(rvLayoutManager) {
             override fun onLoadMore(page: Int, view: RecyclerView) {
                 if (currentPageIndex < totalPages) {
-                    currentPageIndex += 1
-                    mActivityViewModel.getWatchers(mRepository.owner.login, mRepository.name,
+                    currentPageIndex++
+                    mActivityViewModel.loadWatchers(mRepository.owner.login, mRepository.name,
                             currentPageIndex, ITEMS_PER_PAGE)
                 }
             }
 
         })
 
-        // Create the observer which updates the UI.
-        mActivityViewModel.getWatchers(mRepository.owner.login, mRepository.name,
-                currentPageIndex, ITEMS_PER_PAGE).observe(this, Observer<WatchersResponse> { response ->
-            totalPages = response.totalPagesCount
-            currentPageIndex = response.currentPageIndex
-            updateUi(response)
-            Log.v(TAG, "Current page index: " + currentPageIndex)
-            Log.v(TAG, "Total pages: " + totalPages)
-            Log.v(TAG, "Items count: " + response.watchers.size)
-        })
+        mActivityViewModel.loadWatchers(mRepository.owner.login, mRepository.name,
+                1, ITEMS_PER_PAGE)
 
         mActivityViewModel.getError().observe(this, Observer {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
-
-        mActivityViewModel.getWatchers(mRepository.owner.login, mRepository.name,
-                currentPageIndex, ITEMS_PER_PAGE)
     }
 
     private fun updateUi(watchersResponse: WatchersResponse) {
@@ -93,7 +95,7 @@ class RepositoryWatchersActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val ITEMS_PER_PAGE = 20
+        const val ITEMS_PER_PAGE = 50
         val TAG = RepositoryWatchersActivity::class.java.simpleName
     }
 }
