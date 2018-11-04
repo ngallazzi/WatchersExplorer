@@ -8,12 +8,9 @@ import com.ngallazzi.watchersexplorer.models.Owner
 import com.ngallazzi.watchersexplorer.models.WatchersResponse
 import com.ngallazzi.watchersexplorer.remote.repository.GithubApi
 import com.ngallazzi.watchersexplorer.remote.repository.PaginationUtils
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 
 /**
  * Created by Nicola on 2017-03-02.
@@ -48,7 +45,7 @@ class RepositoryWatchersActivityViewModel() : ViewModel() {
                     val totalPages = PaginationUtils.getTotalPagesCount(headers)
                     watchersResponse.value = WatchersResponse(response.body()!!, pageIndex, totalPages)
                 } else {
-                    showError.value = "An error occurred" // todo return a better message
+                    showError.value = response.errorBody()!!.string()
                 }
             }
 

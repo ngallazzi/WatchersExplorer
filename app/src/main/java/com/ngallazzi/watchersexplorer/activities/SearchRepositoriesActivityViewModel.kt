@@ -1,13 +1,12 @@
 package com.ngallazzi.watchersexplorer.activities
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.ngallazzi.watchersexplorer.remote.repository.GithubApi.Companion.disposable
-import com.ngallazzi.watchersexplorer.remote.repository.GithubApi.Companion.gitHubApiServe
 import com.ngallazzi.watchersexplorer.models.RepositoriesResponse
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.ngallazzi.watchersexplorer.remote.repository.GithubApi
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 /**
  * WatchersExplorer
@@ -16,18 +15,27 @@ import io.reactivex.schedulers.Schedulers
  */
 
 class SearchRepositoriesActivityViewModel : ViewModel() {
-    var repositoriesResponse: MutableLiveData<RepositoriesResponse> = MutableLiveData() // todo make this private
-    var showError: MutableLiveData<String> = MutableLiveData() // todo make this private
+    var repositoriesResponse: MutableLiveData<RepositoriesResponse> = MutableLiveData()
+    var showError: MutableLiveData<String> = MutableLiveData()
+
 
     fun getRepositories(query: String, pageIndex: Int, itemsPerPage: Int) {
-        disposable = gitHubApiServe.listRepositories(query, pageIndex, itemsPerPage)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        { result -> repositoriesResponse.value = result },
-                        { error -> showError.postValue(error.message) }
-                )
+        val service = GithubApi.gitHubApiServe
+        val call = service.listRepositories(query, pageIndex, itemsPerPage)
+        call.enqueue(object : Callback<RepositoriesResponse> {
+            override fun onResponse(call: Call<RepositoriesResponse>, response: Response<RepositoriesResponse>) {
+                if (response.isSuccessful) {
+                    repositoriesResponse.value = response.body()
+                } else {
+                    showError.value = response.errorBody()!!.string()
+                }
+            }
 
+            override fun onFailure(call: Call<RepositoriesResponse>, t: Throwable) {
+                showError.value = t.message
+            }
+        })
     }
+
 }
 

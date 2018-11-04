@@ -42,9 +42,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     // Moshi converter, more performant than gson
     implementation "com.squareup.retrofit2:converter-moshi:2.0.0"
-    // Rx java for reactive calls
-    implementation "com.squareup.retrofit2:adapter-rxjava2:2.3.0"
-    implementation "io.reactivex.rxjava2:rxandroid:2.0.2"
     // Support design library
     implementation "com.google.android.material:material:1.0.0"
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.2.71"

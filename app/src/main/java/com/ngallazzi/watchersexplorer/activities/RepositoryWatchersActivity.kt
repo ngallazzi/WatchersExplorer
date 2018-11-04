@@ -16,6 +16,7 @@ import com.ngallazzi.watchersexplorer.adapters.WatcherAdapter
 import com.ngallazzi.watchersexplorer.models.Owner
 import com.ngallazzi.watchersexplorer.models.Repository
 import com.ngallazzi.watchersexplorer.models.WatchersResponse
+import com.ngallazzi.watchersexplorer.models.toReadableDate
 import kotlinx.android.synthetic.main.activity_repository_watchers.*
 
 /**
@@ -55,9 +56,6 @@ class RepositoryWatchersActivity : AppCompatActivity() {
             totalPages = it.totalPagesCount
             currentPageIndex = it.currentPageIndex
             updateUi(it)
-            Log.v(TAG, "Current page index: " + currentPageIndex)
-            Log.v(TAG, "Total pages: " + totalPages)
-            Log.v(TAG, "Items count: " + it.watchers.size)
         })
 
         rvWatchers.addOnScrollListener(object : EndlessRecyclerViewScrollListener(rvLayoutManager) {
@@ -90,8 +88,9 @@ class RepositoryWatchersActivity : AppCompatActivity() {
     private fun setLayoutHeader(repository: Repository) {
         tvName.text = repository.name
         tvDescription.text = repository.description
-        tvLastUpdate.text = getString(R.string.last_update_date, repository.updatedAt)
-        tvCloneUrl.text = getString(R.string.clone_url, Html.fromHtml(repository.cloneUrl))
+        tvLastUpdate.text = getString(R.string.last_update_date, repository.updatedAt?.toReadableDate())
+        val cloneUrlString = "<a href='$repository.cloneUrl'> Link </a>"
+        tvCloneUrl.text = getString(R.string.clone_url, Html.fromHtml(cloneUrlString))
     }
 
     companion object {

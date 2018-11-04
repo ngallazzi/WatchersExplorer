@@ -57,7 +57,8 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
         })
 
         mActivityViewModel.showError.observe(this, Observer {
-            Toast.makeText(this@SearchRepositoriesActivity, it, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@SearchRepositoriesActivity,
+                    getString(R.string.api_error, it), Toast.LENGTH_SHORT).show()
         })
 
         rvRepositories.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -108,12 +109,17 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
     }
 
     private fun updateUi(repositoriesList: List<Repository>) {
-        tvHint.visibility = View.GONE
-        rvRepositories.visibility = View.VISIBLE
-        for (item in repositoriesList) {
-            repositories.add(item)
+        if (repositoriesList.size > 0) {
+            tvHint.visibility = View.GONE
+            rvRepositories.visibility = View.VISIBLE
+            for (item in repositoriesList) {
+                repositories.add(item)
+            }
+            rvRepositories.adapter?.notifyDataSetChanged()
+        } else {
+            Toast.makeText(this,
+                    getString(R.string.no_repositories_found), Toast.LENGTH_SHORT).show()
         }
-        rvRepositories.adapter?.notifyDataSetChanged()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

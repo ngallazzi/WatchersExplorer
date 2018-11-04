@@ -3,13 +3,10 @@ package com.ngallazzi.watchersexplorer.remote.repository
 import com.ngallazzi.watchersexplorer.BuildConfig
 import com.ngallazzi.watchersexplorer.models.Owner
 import com.ngallazzi.watchersexplorer.models.RepositoriesResponse
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -20,7 +17,7 @@ interface GithubApi {
     @GET("search/repositories")
     fun listRepositories(@Query("q") key: String,
                          @Query("page") page: Int = 1,
-                         @Query("per_page") perPage: Int = 20): Observable<RepositoriesResponse>
+                         @Query("per_page") perPage: Int = 20): Call<RepositoriesResponse>
 
     //https://api.github.com/repos/ngallazzi/tripbook/subscribers
 
@@ -38,8 +35,6 @@ interface GithubApi {
             var client = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
             val retrofit = Retrofit.Builder()
-                    .addCallAdapterFactory(
-                            RxJava2CallAdapterFactory.create())
                     .addConverterFactory(
                             MoshiConverterFactory.create())
                     .baseUrl(BuildConfig.BASE_URL)
@@ -54,7 +49,6 @@ interface GithubApi {
             create()
         }
 
-        var disposable: Disposable? = null
     }
 
 
