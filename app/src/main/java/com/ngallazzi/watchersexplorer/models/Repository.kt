@@ -1,7 +1,6 @@
 package com.ngallazzi.watchersexplorer.models
 
 import android.os.Parcelable
-import android.util.Log
 import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 import java.text.ParseException
@@ -14,6 +13,7 @@ data class Repository(@Json(name = "id") var id: String,
                       @Json(name = "description") var description: String?,
                       @Json(name = "url") val url: String?,
                       @Json(name = "clone_url") val cloneUrl: String?,
+                      @Json(name = "html_url") val htmlUrl: String?,
                       @Json(name = "updated_at") val updatedAt: String?,
                       @Json(name = "watchers") var watchers: Int = 0,
                       @Json(name = "owner") var owner: Owner) : Parcelable

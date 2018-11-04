@@ -8,7 +8,7 @@
     <string name="repository_id" translatable="false">repository_id</string>
     <string name="watchers">Watchers:</string>
     <string name="last_update_date">Last update: %1$s</string>
-    <string name="clone_url">Clone url: %1$s</string>
+    <string name="url">Url: %1$s</string>
     <string name="description">Description</string>
     <string name="repository_name">Repository name</string>
     <string name="api_error">An error occurred: %1$s</string>

@@ -1,8 +1,10 @@
 package com.ngallazzi.watchersexplorer.activities
 
+import android.os.Build
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -89,12 +91,19 @@ class RepositoryWatchersActivity : AppCompatActivity() {
         tvName.text = repository.name
         tvDescription.text = repository.description
         tvLastUpdate.text = getString(R.string.last_update_date, repository.updatedAt?.toReadableDate())
-        val cloneUrlString = "<a href='$repository.cloneUrl'> Link </a>"
-        tvCloneUrl.text = getString(R.string.clone_url, Html.fromHtml(cloneUrlString))
+        tvUrl.text = getString(R.string.url, repository.htmlUrl)
     }
+
+    private fun fromHtml(html: String): Spanned {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(html);
+        }
+    }
+
 
     companion object {
         const val ITEMS_PER_PAGE = 50
-        val TAG = RepositoryWatchersActivity::class.java.simpleName
     }
 }

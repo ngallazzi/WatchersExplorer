@@ -44,15 +44,14 @@
         app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
 
     <TextView
-        android:id="@+id/tvCloneUrl"
+        android:id="@+id/tvUrl"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        tools:text="http://www.example.com"
         android:autoLink="web"
-        android:linksClickable="true"
-        android:text="@string/clone_url"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvLastUpdate" />
@@ -68,7 +67,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvCloneUrl" />
+        app:layout_constraintTop_toBottomOf="@+id/tvUrl" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvWatchers"
