@@ -53,6 +53,7 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
         // Create the observer which updates the UI.
         mActivityViewModel.repositoriesResponse.observe(this, Observer { response ->
             isLoading = false;
+            totalPagesCount = PaginationUtils.getTotalPagesCount(response.itemsCount, ITEMS_PER_PAGE)
             updateUi(response.items)
         })
 
@@ -77,7 +78,6 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
                     if ((rvVisibleItemsCount + rvFirstVisibleItemPosition) >= rvTotalItemsCount
                             && rvFirstVisibleItemPosition >= 0
                             && rvTotalItemsCount >= ITEMS_PER_PAGE) {
-                        totalPagesCount = PaginationUtils.getTotalPagesCount(rvTotalItemsCount, rvVisibleItemsCount)
                         currentPageIndex += 1
                         mActivityViewModel.getRepositories(query, currentPageIndex, ITEMS_PER_PAGE)
                         pbLoading.visibility = View.VISIBLE
@@ -113,7 +113,9 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
         }
     }
 
+
     private fun updateUi(repositoriesList: List<Repository>) {
+        tvHint.visibility = View.GONE
         pbLoading.visibility = View.GONE
         if (repositoriesList.size > 0) {
             rvRepositories.visibility = View.VISIBLE
