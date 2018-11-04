@@ -57,6 +57,7 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
         })
 
         mActivityViewModel.showError.observe(this, Observer {
+            pbLoading.visibility = View.GONE
             Toast.makeText(this@SearchRepositoriesActivity,
                     getString(R.string.api_error, it), Toast.LENGTH_SHORT).show()
         })
@@ -79,6 +80,7 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
                         totalPagesCount = PaginationUtils.getTotalPagesCount(rvTotalItemsCount, rvVisibleItemsCount)
                         currentPageIndex += 1
                         mActivityViewModel.getRepositories(query, currentPageIndex, ITEMS_PER_PAGE)
+                        pbLoading.visibility = View.VISIBLE
                         isLoading = true
                     }
                 }
@@ -105,12 +107,15 @@ open class SearchRepositoriesActivity : AppCompatActivity() {
             this.query = query
             repositories.clear()
             mActivityViewModel.getRepositories(query, currentPageIndex, ITEMS_PER_PAGE)
+            isLoading = true
+            tvHint.visibility = View.GONE
+            pbLoading.visibility = View.VISIBLE
         }
     }
 
     private fun updateUi(repositoriesList: List<Repository>) {
+        pbLoading.visibility = View.GONE
         if (repositoriesList.size > 0) {
-            tvHint.visibility = View.GONE
             rvRepositories.visibility = View.VISIBLE
             for (item in repositoriesList) {
                 repositories.add(item)
